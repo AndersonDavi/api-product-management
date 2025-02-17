@@ -12,6 +12,10 @@ import { AuthService } from './auth.service';
 import { RegisterDTO } from './dto/register.dto';
 import { LoginDTO } from './dto/login.dto';
 import { AuthGuard } from './guard/auth.guard';
+import { Roles } from './decorator/role.decorator';
+import { RoleGuard } from './guard/role.guard';
+import { UserRole } from './enums/role.enum';
+import { Auth } from './decorator/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -40,7 +44,8 @@ export class AuthController {
   }
 
   @Get('profile')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Auth([UserRole.admin, UserRole.user])
   async profile(@Request() req) {
     return req.user;
   }

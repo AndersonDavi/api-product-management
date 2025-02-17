@@ -25,7 +25,6 @@ export class AuthService {
       ...registerDTO,
       password: hashedPassword,
     });
-    console.log(result);
     const userObject = result.toObject();
     delete userObject.password;
     return userObject;
@@ -44,8 +43,8 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
     const payload = {
-      userId: user.id,
-      userRole: user.role,
+      id: user.id,
+      role: user.role,
     };
     const token = await this.jwtService.signAsync(payload);
     return token;
