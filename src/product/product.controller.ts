@@ -24,7 +24,8 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 export class ProductController {
   constructor(private productSerrvice: ProductService) {}
 
-  @Post('create')
+  @Auth([UserRole.admin])
+  @Post('/create')
   async createProduct(@Res() res, @Body() createProductDTO: CreateProductDTO) {
     await this.productSerrvice
       .createProduct(createProductDTO)
@@ -36,6 +37,7 @@ export class ProductController {
       });
   }
 
+  @Auth([UserRole.admin, UserRole.user])
   @Get('/')
   async getProducts(@Res() res) {
     const products = await this.productSerrvice.getProducts();
@@ -44,6 +46,7 @@ export class ProductController {
     });
   }
 
+  @Auth([UserRole.admin, UserRole.user])
   @Get('/:id')
   async getProduct(@Res() res, @Param('id') id) {
     const product = await this.productSerrvice.getProduct(id);
@@ -51,7 +54,7 @@ export class ProductController {
     return res.status(HttpStatus.OK).json(product);
   }
 
-  
+  @Auth([UserRole.admin])
   @Put('/delete/:id')
   async deleteProduct(
     @Res() res,
@@ -66,6 +69,7 @@ export class ProductController {
     });
   }
 
+  @Auth([UserRole.admin])
   @Put('/update/:id')
   async updateProduct(
     @Res() res,

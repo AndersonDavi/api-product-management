@@ -21,7 +21,7 @@ import { Auth } from './decorator/auth.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Post('/register')
   async register(@Res() res, @Body() registerDTO: RegisterDTO) {
     const result = await this.authService
       .register(registerDTO)
@@ -33,7 +33,7 @@ export class AuthController {
       });
   }
 
-  @Post('login')
+  @Post('/login')
   async login(@Res() res, @Body() loginDTO: LoginDTO) {
     const result = await this.authService.login(loginDTO).then((result) => {
       return res.status(HttpStatus.OK).json({
@@ -43,7 +43,7 @@ export class AuthController {
     });
   }
 
-  @Get('profile')
+  @Get('/profile')
   @UseGuards(AuthGuard, RoleGuard)
   @Auth([UserRole.admin, UserRole.user])
   async profile(@Request() req) {
