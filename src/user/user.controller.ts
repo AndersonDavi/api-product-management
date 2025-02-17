@@ -10,6 +10,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
@@ -19,6 +20,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RoleGuard } from 'src/auth/guard/role.guard';
 import { Auth } from 'src/auth/decorator/auth.decorator';
 import { UserRole } from 'src/common/enums/role.enum';
+import { ObjectId } from 'mongodb';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -44,7 +46,7 @@ export class UserController {
     });
   }
 
-  @Auth([UserRole.admin,UserRole.user])
+  @Auth([UserRole.admin, UserRole.user])
   @Get('/:id')
   async getUser(@Res() res, @Param('id') id) {
     const user = await this.userService.getUser(id);
@@ -82,16 +84,22 @@ export class UserController {
     });
   }
 
-  @Auth([UserRole.admin,UserRole.user])
+  @Auth([UserRole.admin, UserRole.user])
   @Put('/update')
-  async updateOwnProfile(@Res() res, @Body() updateUserDTO: UpdateUserDTO) {
+  async updateOwnProfile(
+    @Res() res,
+    @Body() updateUserDTO: UpdateUserDTO,
+    @Req() req,
+  ) {
     const user = await this.userService.updateUser(
       updateUserDTO._id,
       updateUserDTO,
     );
     if (!user) throw new NotFoundException('User does not exist!');
-    if (user._id !== updateUserDTO._id) {
-      throw new NotFoundException('You are not authorized to perform this action');
+    if (user._id.toString() !== req.user.id) {
+      throw new NotFoundException(
+        'You are not authorized to perform this action',
+      );
     }
     return res.status(HttpStatus.OK).json({
       message: 'User Updated Successfully',

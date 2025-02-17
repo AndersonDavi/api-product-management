@@ -8,22 +8,36 @@ import {
   HttpStatus,
   NotFoundException,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDTO } from './dto/create-invoice.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Auth } from 'src/auth/decorator/auth.decorator';
 import { UserRole } from 'src/common/enums/role.enum';
+import { ProductService } from 'src/product/product.service';
 
 @UseGuards(AuthGuard)
 @Controller('invoice')
 export class InvoiceController {
-  constructor(private readonly invoiceService: InvoiceService) {}
+  constructor(
+    private readonly invoiceService: InvoiceService,
+    private readonly productService: ProductService,
+  ) {}
 
   @Auth([UserRole.user])
   @Post('/create')
-  async createInvoice(@Res() res, @Body() createInvoiceDTO: CreateInvoiceDTO) {
-    const invoice = await this.invoiceService.createInvoice(createInvoiceDTO);
+  async createInvoice(
+    @Res() res,
+    @Body() createInvoiceDTO: CreateInvoiceDTO,
+    @Req() req,
+  ) {
+    const invoiceData = {
+      ...createInvoiceDTO,
+      user_id: req.user.id,
+    };
+
+    const invoice = await this.invoiceService.createInvoice(invoiceData);
     return res.status(HttpStatus.OK).json({
       message: 'Invoice Successfully Created',
       invoice,
@@ -35,7 +49,22 @@ export class InvoiceController {
   async getInvoiceById(@Res() res, @Param('id') id: string) {
     const invoice = await this.invoiceService.getInvoiceById(id);
     if (!invoice) throw new NotFoundException('Invoice not found');
-    return res.status(HttpStatus.OK).json(invoice);
+
+    const productsWithDetails = await Promise.all(
+      invoice.products.map(async (product) => {
+        const productDetails = await this.productService.getProduct(product.productId);
+        return {
+          ...product,
+          name: productDetails!.name,
+          image: productDetails!.image,
+        };
+      }),
+    );
+
+    return res.status(HttpStatus.OK).json({
+      ...invoice,
+      products: productsWithDetails,
+    });
   }
 
   @Auth([UserRole.admin, UserRole.user])

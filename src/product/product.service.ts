@@ -15,10 +15,12 @@ export class ProductService {
     return products;
   }
   async getProduct(productID: string): Promise<Product | null> {
-    const product = await this.productModel.findById({
-      active: true,
+    console.log('productID', productID);
+
+    const product = await this.productModel.findOne({
       _id: productID,
     });
+    console.log('produt finded', product);
     return product;
   }
   async createProduct(createProductDTO: CreateProductDTO): Promise<Product> {

@@ -12,5 +12,6 @@ import { GlobalModule } from 'src/global.module';
   ],
   controllers: [ProductController],
   providers: [ProductService],
+  exports: [ProductService],
 })
 export class ProductModule {}

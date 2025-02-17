@@ -22,12 +22,12 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 @UseGuards(AuthGuard)
 @Controller('product')
 export class ProductController {
-  constructor(private productSerrvice: ProductService) {}
+  constructor(private productService: ProductService) {}
 
   @Auth([UserRole.admin])
   @Post('/create')
   async createProduct(@Res() res, @Body() createProductDTO: CreateProductDTO) {
-    await this.productSerrvice
+    await this.productService
       .createProduct(createProductDTO)
       .then((product) => {
         return res.status(HttpStatus.OK).json({
@@ -40,7 +40,7 @@ export class ProductController {
   @Auth([UserRole.admin, UserRole.user])
   @Get('/')
   async getProducts(@Res() res) {
-    const products = await this.productSerrvice.getProducts();
+    const products = await this.productService.getProducts();
     return res.status(HttpStatus.OK).json({
       products,
     });
@@ -48,8 +48,8 @@ export class ProductController {
 
   @Auth([UserRole.admin, UserRole.user])
   @Get('/:id')
-  async getProduct(@Res() res, @Param('id') id) {
-    const product = await this.productSerrvice.getProduct(id);
+  async getProduct(@Res() res, @Param('id') id: string) {
+    const product = await this.productService.getProduct(id);
     if (!product) throw new NotFoundException('Product does not exist!');
     return res.status(HttpStatus.OK).json(product);
   }
@@ -61,7 +61,7 @@ export class ProductController {
     @Body() { newStatus }: { newStatus: boolean },
     @Param('id') id,
   ) {
-    const product = await this.productSerrvice.deleteProduct(id, newStatus);
+    const product = await this.productService.deleteProduct(id, newStatus);
     if (!product) throw new NotFoundException('Product does not exist!');
     return res.status(HttpStatus.OK).json({
       message: 'Product Deleted Successfully',
@@ -76,7 +76,7 @@ export class ProductController {
     @Body() createProductDTO: CreateProductDTO,
     @Param('id') id,
   ) {
-    const product = await this.productSerrvice.updateProduct(
+    const product = await this.productService.updateProduct(
       id,
       createProductDTO,
     );

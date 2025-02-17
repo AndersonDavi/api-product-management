@@ -17,15 +17,22 @@ export class InvoiceService {
 
     // Verify stock availability
     for (const product of products) {
-      const productDetails = await this.productService.getProduct(product.productId);
+      const productDetails = await this.productService.getProduct(
+        product.productId,
+      );
       if (!productDetails || productDetails.stock < product.quantity) {
-        throw new NotFoundException(`Product ${product.productId} is out of stock`);
+        throw new NotFoundException(
+          `Product ${product.productId} is out of stock`,
+        );
       }
     }
 
     // Deduct stock
     for (const product of products) {
-      await this.productService.updateStock(product.productId, -product.quantity);
+      await this.productService.updateStock(
+        product.productId,
+        -product.quantity,
+      );
     }
 
     const invoice = new this.invoiceModel(createInvoiceDTO);
@@ -33,7 +40,7 @@ export class InvoiceService {
   }
 
   async getInvoiceById(invoiceId: string): Promise<Invoice | null> {
-    const invoice = await this.invoiceModel.findById(invoiceId);
+    const invoice = await this.invoiceModel.findById(invoiceId).lean().exec();
     if (!invoice) {
       throw new NotFoundException('Invoice not found');
     }

@@ -1,15 +1,15 @@
-import { Schema } from 'mongoose';
+import * as mongoose from 'mongoose';
 
-const InvoiceSchema = new Schema({
+const InvoiceSchema = new mongoose.Schema({
   user_id: { type: String, required: true },
   products: [
     {
-      productId: { type: String, required: true },
+      productId: { type: String, ref: 'Product', required: true },
       quantity: { type: Number, required: true },
     },
   ],
   total: { type: Number, required: true },
-  date: { type: Date, default: Date.now },
+  date: { type: Date, required: true, default: Date.now }, 
 });
 
 export default InvoiceSchema;

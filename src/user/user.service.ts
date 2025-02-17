@@ -21,7 +21,7 @@ export class UserService {
   }
 
   async getUser(userID: string): Promise<User | null> {
-    const user = await this.userModel.findById({ active: true, _id: userID });
+    const user = await this.userModel.findOne({ _id: userID, active: true }).select('-password');
     return user;
   }
 
@@ -47,7 +47,7 @@ export class UserService {
       userID,
       updateUserDTO,
       { new: true },
-    );
+    ).select('-password');
     return updatedUser;
   }
 }
