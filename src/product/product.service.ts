@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -14,7 +14,7 @@ export class ProductService {
     const products = await this.productModel.find({ active: true });
     return products;
   }
-  async getProduct(productID: number): Promise<Product | null> {
+  async getProduct(productID: string): Promise<Product | null> {
     const product = await this.productModel.findById({
       active: true,
       _id: productID,
@@ -49,5 +49,17 @@ export class ProductService {
       { new: true },
     );
     return updatedProduct;
+  }
+
+  async updateStock(productId: string, quantity: number): Promise<void> {
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    if (product.stock + quantity < 0) {
+      throw new NotFoundException('Insufficient stock');
+    }
+    product.stock += quantity;
+    await product.save();
   }
 }

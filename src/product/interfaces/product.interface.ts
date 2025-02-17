@@ -10,6 +10,6 @@ export interface Product extends Document {
   readonly price: number;
   readonly rating: number;
   readonly sizes: string[];
-  readonly stock: number;
+  stock: number;
   readonly updatedAt: Date;
 }
