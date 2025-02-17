@@ -11,7 +11,7 @@ export class UserService {
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
   async getUsers(): Promise<User[]> {
-    const users = await this.userModel.find({ active: true });
+    const users = await this.userModel.find({ active: true }).select('-password');
     return users;
   }
 
@@ -19,6 +19,7 @@ export class UserService {
     const user = await this.userModel.findOne({ email, active: true });
     return user;
   }
+  
 
   async getUser(userID: string): Promise<User | null> {
     const user = await this.userModel.findOne({ _id: userID, active: true }).select('-password');
