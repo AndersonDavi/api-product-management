@@ -9,12 +9,17 @@ import {
   NotFoundException,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { create } from 'domain';
 import { CreateProductDTO } from './dto/create-product.dto';
 import { log } from 'console';
 import { ProductService } from './product.service';
+import { Auth } from '../auth/decorator/auth.decorator';
+import { UserRole } from 'src/common/enums/role.enum';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('product')
 export class ProductController {
   constructor(private productSerrvice: ProductService) {}

@@ -14,7 +14,7 @@ import { LoginDTO } from './dto/login.dto';
 import { AuthGuard } from './guard/auth.guard';
 import { Roles } from './decorator/role.decorator';
 import { RoleGuard } from './guard/role.guard';
-import { UserRole } from './enums/role.enum';
+import { UserRole } from '../common/enums/role.enum';
 import { Auth } from './decorator/auth.decorator';
 
 @Controller('auth')
