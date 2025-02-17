@@ -75,9 +75,15 @@ export class UserController {
     @Res() res,
     @Body() updateUserDTO: UpdateUserDTO,
     @Param('id') id,
+    @Req() req,
   ) {
     const user = await this.userService.updateUser(id, updateUserDTO);
     if (!user) throw new NotFoundException('User does not exist!');
+    if (user._id.toString() === req.user.id) {
+      throw new NotFoundException(
+        'You are not authorized to perform this action',
+      );
+    }
     return res.status(HttpStatus.OK).json({
       message: 'User Updated Successfully',
       user,

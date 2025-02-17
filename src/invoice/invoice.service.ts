@@ -15,7 +15,6 @@ export class InvoiceService {
   async createInvoice(createInvoiceDTO: CreateInvoiceDTO): Promise<Invoice> {
     const { products } = createInvoiceDTO;
 
-    // Verify stock availability
     for (const product of products) {
       const productDetails = await this.productService.getProduct(
         product.productId,
@@ -51,12 +50,50 @@ export class InvoiceService {
     return await this.invoiceModel.find({ user_id: userId });
   }
 
-  async getUserPurchasesLastMonth(userId: string): Promise<number> {
+  async getUserInvoicesLastMonth(userId: string): Promise<number> {
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
     return await this.invoiceModel.countDocuments({
       user_id: userId,
       date: { $gte: oneMonthAgo },
     });
+  }
+
+  async getAllInvoicesLastMonth(): Promise<Invoice[]> {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const invoices = await this.invoiceModel.find({
+      date: { $gte: oneMonthAgo },
+    }).lean().exec();
+
+    // Add product details to each invoice
+    for (const invoice of invoices) {
+      for (const product of invoice.products) {
+        const productDetails = await this.productService.getProduct(
+          product.productId,
+        );
+        if (!productDetails) {
+          throw new NotFoundException(
+            `Product ${product.productId} is not found`,
+          );
+        }
+        product.name = productDetails.name;
+        product.price = productDetails.price;
+        product.image = productDetails.image;
+      }
+    }
+
+    return invoices;
+  }
+
+  async countAllInvoicesLastMonth(): Promise<number> {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const invoices = await this.invoiceModel.find({
+      date: { $gte: oneMonthAgo },
+    });
+    console.log(invoices);
+
+    return invoices.length;
   }
 }

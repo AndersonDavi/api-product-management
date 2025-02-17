@@ -7,12 +7,6 @@ import {
 } from 'class-validator';
 export class CreateProductDTO {
   @IsString()
-  readonly _id: string;
-  @IsBoolean()
-  readonly active: boolean;
-  @IsDate()
-  readonly createdAt: Date;
-  @IsString()
   readonly description: string;
   @IsString()
   readonly image: string;
@@ -27,6 +21,4 @@ export class CreateProductDTO {
   readonly sizes: string[];
   @IsNumber()
   readonly stock: number;
-  @IsDate()
-  readonly updatedAt: Date;
 }
